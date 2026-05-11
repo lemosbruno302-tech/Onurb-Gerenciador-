@@ -1,3 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Clientes - TV</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+        }
+
+        body { font-family: sans-serif; background: var(--bg); padding: 20px; color: #1e293b; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        
+        h2 { border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+
+        .form-group { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 20px; align-items: end; }
+        input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; }
+        
+        button { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-add { background: var(--primary); color: white; }
+        .btn-add:hover { background: #1d4ed8; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #f1f5f9; text-align: left; padding: 12px; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+
+        .status-pill { padding: 4px 8px; border-radius: 12px; font-size: 0.85em; font-weight: bold; }
+        .urgente { background: #fee2e2; color: var(--danger); }
+        .tranquilo { background: #dcfce7; color: var(--success); }
+
+        .actions button { padding: 5px 8px; margin-right: 5px; font-size: 0.8em; }
+        .btn-edit { background: #eab308; color: white; }
+        .btn-del { background: var(--danger); color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Gerenciador de Clientes & Servidores</h2>
+    
+    <div class="form-group">
+        <div>
+            <label>Nome do Cliente</label><br>
+            <input type="text" id="nome" placeholder="Ex: João Silva">
+        </div>
+        <div>
+            <label>Servidor</label><br>
+            <select id="servidor">
+                <option value="Unitv">Unitv</option>
+                <option value="Blinder">Blinder</option>
+                <option value="Star Play">Star Play</option>
+            </select>
+        </div>
+        <div>
+            <label>Vencimento</label><br>
+            <input type="date" id="dataVencimento">
+        </div>
+        <input type="hidden" id="editIndex" value="-1">
+        <button class="btn-add" onclick="salvarCliente()" id="btnSalvar">Adicionar</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Servidor</th>
+                <th>Vencimento</th>
+                <th>Dias Restantes</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="listaClientes"></tbody>
+    </table>
+</div>
+
+<script>
+    let clientes = JSON.parse(localStorage.getItem('clientes_tv')) || [];
+
+    function calcularDias(data) {
+        const hoje = new Date();
+        const venc = new Date(data);
+        const diff = venc - hoje;
+        return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    }
+
+    function salvarCliente() {
+        const nome = document.getElementById('nome').value;
+        const servidor = document.getElementById('servidor').value;
+        const data = document.getElementById('dataVencimento').value;
+        const index = document.getElementById('editIndex').value;
+
+        if(!nome || !data) return alert("Preencha todos os campos!");
+
+        const cliente = { nome, servidor, data };
+
+        if(index === "-1") {
+            clientes.push(cliente);
+        } else {
+            clientes[index] = cliente;
+            document.getElementById('editIndex').value = "-1";
+            document.getElementById('btnSalvar').innerText = "Adicionar";
+        }
+
+        localStorage.setItem('clientes_tv', JSON.stringify(clientes));
         limparCampos();
         renderizar();
     }
