@@ -1,70 +1,275 @@
-
-  
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OG Manager - Flex</title>
+    <title>OG Manager - Bruno Lemos</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
         :root {
             --primary: #2563eb;
-            --whatsapp: #25d366;
-            --bg: #f1f5f9;
+            --bg: #f8fafc;
             --card-bg: #ffffff;
-            --text: #1e293b;
+            --text: #0f172a;
+            --text-light: #64748b;
             --danger: #ef4444;
+            --warning: #f59e0b;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 20px; }
 
         .container { max-width: 1200px; margin: auto; }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 15px; flex-wrap: wrap; }
-        .search-bar { flex: 1; min-width: 300px; }
-        .search-bar input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; }
-
-        .btn-add { background: var(--primary); color: white; padding: 12px 24px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
-
-        .client-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-
-        .card { background: var(--card-bg); border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); }
-        .card h3 { margin-bottom: 5px; }
-        .servidor-tag { color: #64748b; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; min-height: 1.2em; display: block; }
+        /* Cabeçalho */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            gap: 20px; 
+            flex-wrap: wrap;
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
         
-        .info-group { margin: 15px 0; font-size: 0.9rem; }
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .brand-section { display: flex; align-items: center; gap: 15px; }
+        .app-logo { width: 50px; height: 50px; border-radius: 12px; background: var(--primary); object-fit: cover; }
+        
+        .titles h1 { font-size: 1.4rem; font-weight: 700; }
+        .signature { font-size: 0.8rem; font-weight: 500; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; }
+        .signature span { color: var(--primary); font-weight: 700; }
 
-        .badge { padding: 3px 10px; border-radius: 12px; font-weight: bold; font-size: 0.8rem; }
+        .controls { display: flex; gap: 10px; flex: 1; justify-content: flex-end; min-width: 300px; }
+        .search-bar { flex: 1; max-width: 400px; }
+        .search-bar input { 
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; outline: none; background: #f1f5f9;
+        }
+
+        .btn { padding: 12px 20px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .btn-add { background: var(--primary); color: white; }
+        .btn-notif { background: #e2e8f0; color: var(--text); font-size: 0.8rem; }
+
+        /* Grid e Cards */
+        .client-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .card { 
+            background: var(--card-bg); border-radius: 16px; padding: 20px; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-left: 6px solid var(--primary);
+        }
+        .card.vence-hoje { border-left-color: var(--danger); animation: pulse 2s infinite; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .servidor-tag { color: var(--primary); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .info-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 0.9rem; }
+        
+        .access-box { 
+            background: #f8fafc; padding: 12px; border-radius: 10px; margin-top: 15px; 
+            border: 1px dashed #cbd5e1; font-size: 0.85rem;
+        }
+
+        .badge { padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 0.75rem; }
         .alert { background: #fee2e2; color: var(--danger); }
+        .warning { background: #fef3c7; color: var(--warning); }
 
-        .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .btn-action { padding: 8px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: bold; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; }
-        
-        .btn-whatsapp { background: var(--whatsapp); color: white; grid-column: span 3; margin-bottom: 5px; font-size: 0.9rem; }
-        .btn-edit { background: #e2e8f0; color: var(--text); }
-        .btn-del { background: #fee2e2; color: var(--danger); }
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-action { padding: 8px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+        .btn-edit { background: #f1f5f9; }
+        .btn-del { background: #fff1f2; color: var(--danger); }
 
-        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100; }
-        .modal-content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; }
-        .modal-content label { display: block; font-size: 0.8rem; margin-top: 10px; font-weight: bold; }
-        .modal-content input, .modal-content select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; }
+        /* Modal */
+        #modal { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); 
+            backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 100; 
+        }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; }
+        .modal-content input, .modal-content select { 
+            width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; 
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>OG Manager</h1>
-        <div class="search-bar">
-            <input type="text" id="busca" placeholder="🔍 Buscar por nome..." oninput="render()">
+        <div class="brand-section">
+            <img src="logo.png" alt="OG" class="app-logo" onerror="this.style.display='none'">
+            <div class="titles">
+                <h1>OG Manager</h1>
+                <p class="signature">Gerenciado por <span>Bruno Lemos</span></p>
+            </div>
         </div>
-        <button class="btn-add" onclick="abrirModal()">+ Novo Cliente</button>
+        <div class="controls">
+            <div class="search-bar">
+                <input type="text" id="busca" placeholder="🔍 Buscar cliente..." oninput="render()">
+            </div>
+            <button class="btn btn-notif" onclick="solicitarNotificacao()">🔔 Ativar Avisos</button>
+            <button class="btn btn-add" onclick="abrirModal()">+ Novo Cliente</button>
+        </div>
     </div>
 
     <div id="client-grid" class="client-grid"></div>
-</div>clientes[idx] = novo; else clientes.push(novo);
-clientes = clientes.filter(c => c.id != id);
-            localStora  
-  
+</div>
+
+<div id="modal">
+    <div class="modal-content">
+        <h2 id="modal-title" style="margin-bottom:20px">Novo Cliente</h2>
+        <input type="hidden" id="edit-id">
+        
+        <label style="font-size:0.8rem; font-weight:bold">👤 Nome do Cliente *</label>
+        <input type="text" id="nome" placeholder="Nome do cliente">
+        
+        <label style="font-size:0.8rem; font-weight:bold">🖥️ Servidor (Opcional)</label>
+        <select id="servidor">
+            <option value="">Nenhum</option>
+            <option value="Unitv">Unitv</option>
+            <option value="Blinder">Blinder</option>
+            <option value="Star Play">Star Play</option>
+        </select>
+        
+        <label style="font-size:0.8rem; font-weight:bold">📅 Data de Vencimento *</label>
+        <input type="date" id="vencimento">
+
+        <label style="font-size:0.8rem; font-weight:bold">🔑 Login (Opcional)</label>
+        <input type="text" id="login_cli">
+        
+        <label style="font-size:0.8rem; font-weight:bold">🔒 Senha (Opcional)</label>
+        <input type="text" id="senha_cli">
+
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-add" onclick="salvar()" style="flex: 2;">Salvar</button>
+            <button class="btn" onclick="fecharModal()" style="flex: 1; background: #eee;">Sair</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let clientes = JSON.parse(localStorage.getItem('og_manager_data')) || [];
+
+    function solicitarNotificacao() {
+        Notification.requestPermission();
+    }
+
+    function abrirModal(id = null) {
+        document.getElementById('modal').style.display = 'flex';
+        if(id) {
+            const c = clientes.find(x => x.id == id);
+            document.getElementById('modal-title').innerText = "Editar Cliente";
+            document.getElementById('edit-id').value = c.id;
+            document.getElementById('nome').value = c.nome;
+            document.getElementById('servidor').value = c.servidor || "";
+            document.getElementById('vencimento').value = c.vencimento;
+            document.getElementById('login_cli').value = c.login_cli || "";
+            document.getElementById('senha_cli').value = c.senha_cli || "";
+        } else {
+            limparForm();
+        }
+    }
+
+    function fecharModal() { document.getElementById('modal').style.display = 'none'; }
+    
+    function limparForm() {
+        document.getElementById('edit-id').value = '';
+        document.querySelectorAll('.modal-content input').forEach(i => i.value = '');
+        document.getElementById('servidor').value = '';
+    }
+
+    function salvar() {
+        const id = document.getElementById('edit-id').value || Date.now();
+        const novo = {
+            id,
+            nome: document.getElementById('nome').value,
+            servidor: document.getElementById('servidor').value,
+            vencimento: document.getElementById('vencimento').value,
+            login_cli: document.getElementById('login_cli').value,
+            senha_cli: document.getElementById('senha_cli').value
+        };
+
+        if(!novo.nome || !novo.vencimento) return alert("Nome e Vencimento são obrigatórios!");
+
+        const idx = clientes.findIndex(c => c.id == id);
+        if(idx > -1) clientes[idx] = novo; else clientes.push(novo);
+
+        localStorage.setItem('og_manager_data', JSON.stringify(clientes));
+        fecharModal();
+        render();
+    }
+
+    function verificarVencimentos() {
+        const hoje = new Date().toISOString().split('T')[0];
+        clientes.forEach(c => {
+            if(c.vencimento === hoje) {
+                if (Notification.permission === "granted") {
+                    new Notification("Vencimento Hoje!", { body: `O acesso de ${c.nome} vence hoje!` });
+                }
+            }
+        });
+    }
+
+    function render() {
+        const busca = document.getElementById('busca').value.toLowerCase();
+        const grid = document.getElementById('client-grid');
+        grid.innerHTML = '';
+
+        clientes.filter(c => c.nome.toLowerCase().includes(busca)).forEach(c => {
+            const dataVenc = new Date(c.vencimento + 'T00:00:00');
+            const hoje = new Date();
+            hoje.setHours(0,0,0,0);
+            
+            const diffTime = dataVenc - hoje;
+            const dias = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const venceHoje = dias === 0;
+
+            grid.innerHTML += `
+                <div class="card ${venceHoje ? 'vence-hoje' : ''}">
+                    <span class="servidor-tag">${c.servidor || 'Geral'}</span>
+                    <h3 style="margin-bottom:10px">👤 ${c.nome}</h3>
+                    
+                    <div class="info-row">
+                        <span>📅 Vencimento:</span>
+                        <strong>${c.vencimento.split('-').reverse().join('/')}</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>Status:</span>
+                        <span class="badge ${dias <= 0 ? 'alert' : dias <= 3 ? 'warning' : ''}">
+                            ${dias === 0 ? 'VENCE HOJE' : dias < 0 ? 'EXPIRADO' : dias + ' dias restantes'}
+                        </span>
+                    </div>
+
+                    ${(c.login_cli || c.senha_cli) ? `
+                        <div class="access-box">
+                            ${c.login_cli ? `<div><strong>User:</strong> ${c.login_cli}</div>` : ''}
+                            ${c.senha_cli ? `<div><strong>Pass:</strong> ${c.senha_cli}</div>` : ''}
+                        </div>
+                    ` : ''}
+
+                    <div class="actions">
+                        <button class="btn-action btn-edit" onclick="abrirModal(${c.id})">Editar</button>
+                        <button class="btn-action btn-del" onclick="remover(${c.id})">Excluir</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function remover(id) {
+        if(confirm("Excluir este cliente?")) {
+            clientes = clientes.filter(c => c.id != id);
+            localStorage.setItem('og_manager_data', JSON.stringify(clientes));
+            render();
+        }
+    }
+
+    render();
+    verificarVencimentos();
+</script>
+
+</body>
+</html>
