@@ -1,3 +1,75 @@
 
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OG Manager - Flex</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --whatsapp: #25d366;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --danger: #ef4444;
+        }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 20px; }
+
+        .container { max-width: 1200px; margin: auto; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 15px; flex-wrap: wrap; }
+        .search-bar { flex: 1; min-width: 300px; }
+        .search-bar input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; }
+
+        .btn-add { background: var(--primary); color: white; padding: 12px 24px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
+
+        .client-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+
+        .card { background: var(--card-bg); border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 5px solid var(--primary); }
+        .card h3 { margin-bottom: 5px; }
+        .servidor-tag { color: #64748b; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; min-height: 1.2em; display: block; }
+        
+        .info-group { margin: 15px 0; font-size: 0.9rem; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+
+        .badge { padding: 3px 10px; border-radius: 12px; font-weight: bold; font-size: 0.8rem; }
+        .alert { background: #fee2e2; color: var(--danger); }
+
+        .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .btn-action { padding: 8px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: bold; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+        
+        .btn-whatsapp { background: var(--whatsapp); color: white; grid-column: span 3; margin-bottom: 5px; font-size: 0.9rem; }
+        .btn-edit { background: #e2e8f0; color: var(--text); }
+        .btn-del { background: #fee2e2; color: var(--danger); }
+
+        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; }
+        .modal-content label { display: block; font-size: 0.8rem; margin-top: 10px; font-weight: bold; }
+        .modal-content input, .modal-content select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>OG Manager</h1>
+        <div class="search-bar">
+            <input type="text" id="busca" placeholder="🔍 Buscar por nome..." oninput="render()">
+        </div>
+        <button class="btn-add" onclick="abrirModal()">+ Novo Cliente</button>
+    </div>
+
+    <div id="client-grid" class="client-grid"></div>
+</div>clientes[idx] = novo; else clientes.push(novo);
+clientes = clientes.filter(c => c.id != id);
+            localStorage.setItem('og_flex_data', JSON.stringify(clientes));
+            render();
+        }
+    }
+
+    render();
+</script>
     
