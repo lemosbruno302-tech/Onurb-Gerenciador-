@@ -1,1 +1,200 @@
 
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OG Manager - Dashboard</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --danger: #ef4444;
+            --success: #22c55e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 20px; }
+
+        .container { max-width: 1200px; margin: auto; }
+
+        /* Cabeçalho e Busca */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 15px; flex-wrap: wrap; }
+        .search-bar { flex: 1; min-width: 300px; position: relative; }
+        .search-bar input { width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        /* Botão Adicionar */
+        .btn-add { background: var(--primary); color: white; padding: 12px 24px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: transform 0.2s; }
+        .btn-add:hover { transform: translateY(-2px); }
+
+        /* Grade de Clientes */
+        .client-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+        /* Card do Cliente */
+        .card { background: var(--card-bg); border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-top: 5px solid var(--primary); position: relative; }
+        .card h3 { margin-bottom: 5px; font-size: 1.2rem; }
+        .card .servidor { color: #64748b; font-size: 0.9rem; margin-bottom: 15px; display: block; font-weight: bold; }
+        
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
+        .days-badge { padding: 4px 12px; border-radius: 20px; font-weight: bold; }
+        .vencido { background: #fee2e2; color: var(--danger); }
+        .ok { background: #dcfce7; color: var(--success); }
+
+        .actions { margin-top: 15px; display: flex; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 15px; }
+        .actions button { flex: 1; padding: 8px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+        .btn-edit { background: #f1f5f9; color: var(--text); }
+        .btn-del { background: #fff1f2; color: var(--danger); }
+
+        /* Modal */
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 450px; }
+        .modal-content input, .modal-content select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>OG Clientes</h1>
+        <div class="search-bar">
+            <input type="text" id="busca" placeholder="🔍 Buscar cliente pelo nome..." oninput="render()">
+        </div>
+        <button class="btn-add" onclick="abrirModal()">+ Novo Cliente</button>
+    </div>
+
+    <!-- Tela Única: Grade de Clientes -->
+    <div id="client-grid" class="client-grid">
+        <!-- JS injeta os cards aqui -->
+    </div>
+</div>
+
+<!-- Modal de Cadastro -->
+<div id="modal">
+    <div class="modal-content">
+        <h2 id="modal-title">Novo Cliente</h2><br>
+        <input type="hidden" id="edit-id">
+        <label>Nome</label><input type="text" id="nome">
+        <label>Servidor</label>
+        <select id="servidor">
+            <option value="Unitv">Unitv</option>
+            <option value="Blinder">Blinder</option>
+            <option value="Star Play">Star Play</option>
+        </select>
+        <label>Vencimento</label><input type="date" id="vencimento">
+        <label>Login (Opcional)</label><input type="text" id="login">
+        <label>Senha (Opcional)</label><input type="text" id="senha">
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-add" onclick="salvar()" style="flex: 2;">Salvar</button>
+            <button onclick="fecharModal()" style="flex: 1; border: none; background: #eee; border-radius: 10px; cursor: pointer;">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let clientes = JSON.parse(localStorage.getItem('og_data')) || [];
+
+    function abrirModal(id = null) {
+        document.getElementById('modal').style.display = 'flex';
+        if(id) {
+            const c = clientes.find(x => x.id == id);
+            document.getElementById('modal-title').innerText = "Editar Cliente";
+            document.getElementById('nome').value = c.nome;
+            document.getElementById('servidor').value = c.servidor;
+            document.getElementById('vencimento').value = c.vencimento;
+            document.getElementById('login').value = c.login || '';
+            document.getElementById('senha').value = c.senha || '';
+            document.getElementById('edit-id').value = c.id;
+        } else {
+            limparForm();
+        }
+    }
+
+    function fecharModal() { document.getElementById('modal').style.display = 'none'; }
+    function limparForm() {
+        document.getElementById('modal-title').innerText = "Novo Cliente";
+        document.querySelectorAll('input').forEach(i => i.value = '');
+        document.getElementById('edit-id').value = '';
+    }
+
+    function salvar() {
+        const id = document.getElementById('edit-id').value || Date.now();
+        const novo = {
+            id,
+            nome: document.getElementById('nome').value,
+            servidor: document.getElementById('servidor').value,
+            vencimento: document.getElementById('vencimento').value,
+            login: document.getElementById('login').value,
+            senha: document.getElementById('senha').value
+        };
+
+        if(!novo.nome || !novo.vencimento) return alert("Nome e Data são obrigatórios!");
+
+        const idx = clientes.findIndex(c => c.id == id);
+        if(idx > -1) clientes[idx] = novo; else clientes.push(novo);
+
+        localStorage.setItem('og_data', JSON.stringify(clientes));
+        fecharModal();
+        render();
+    }
+
+    function calculateDays(data) {
+        const diff = new Date(data) - new Date().setHours(0,0,0,0);
+        return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    }
+
+    function render() {
+        const busca = document.getElementById('busca').value.toLowerCase();
+        const grid = document.getElementById('client-grid');
+        grid.innerHTML = '';
+
+        clientes.filter(c => c.nome.toLowerCase().includes(busca)).forEach(c => {
+            const dias = calculateDays(c.vencimento);
+            const statusClass = dias <= 3 ? 'vencido' : 'ok';
+            const dataBr = c.vencimento.split('-').reverse().join('/');
+
+            grid.innerHTML += `
+                <div class="card">
+                    <h3>${c.nome}</h3>
+                    <span class="servidor">${c.servidor}</span>
+                    <div class="info-row">
+                        <span>📅 Vencimento:</span>
+                        <span>${dataBr}</span>
+                    </div>
+                    <div class="info-row">
+                        <span>⏳ Status:</span>
+                        <span class="days-badge ${statusClass}">${dias} dias</span>
+                    </div>
+                    ${c.login ? `<div class="info-row" style="font-size: 0.8rem; color: #64748b;"><span>User: ${c.login}</span><span>Senha: ${c.senha}</span></div>` : ''}
+                    <div class="actions">
+                        <button class="btn-edit" onclick="abrirModal(${c.id})">Editar</button>
+                        <button class="btn-del" onclick="remover(${c.id})">Excluir</button>
+                    </div>
+                </div>
+            `;
+
+            if(dias === 0) {
+                if(Notification.permission === "granted") {
+                    new Notification("Vencimento Hoje", { body: `O cliente ${c.nome} vence hoje!` });
+                }
+            }
+        });
+    }
+
+    function remover(id) {
+        if(confirm("Deseja apagar este cliente?")) {
+            clientes = clientes.filter(c => c.id != id);
+            localStorage.setItem('og_data', JSON.stringify(clientes));
+            render();
+        }
+    }
+
+    // Pedir permissão de notificação
+    if ("Notification" in window) Notification.requestPermission();
+
+    render();
+</script>
+
+</body>
+</html>
