@@ -62,130 +62,8 @@
     </div>
 
     <div id="client-grid" class="client-grid"></div>
-</div>
-
-<div id="modal">
-    <div class="modal-content">
-        <h2 id="modal-title">Novo Cliente</h2>
-        <input type="hidden" id="edit-id">
-        
-        <label>Nome do Cliente *</label>
-        <input type="text" id="nome">
-        
-        <label>WhatsApp (com DDD) *</label>
-        <input type="number" id="whatsapp" placeholder="Ex: 5555988112233">
-        
-        <label>Servidor (Opcional)</label>
-        <select id="servidor">
-            <option value="">Nenhum / Não informado</option>
-            <option value="Unitv">Unitv</option>
-            <option value="Blinder">Blinder</option>
-            <option value="Star Play">Star Play</option>
-        </select>
-        
-        <label>Data de Vencimento *</label>
-        <input type="date" id="vencimento">
-
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button class="btn-add" onclick="salvar()" style="flex: 2;">Salvar</button>
-            <button onclick="fecharModal()" style="flex: 1; border: none; border-radius: 10px; cursor: pointer;">Sair</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    let clientes = JSON.parse(localStorage.getItem('og_flex_data')) || [];
-
-    function abrirModal(id = null) {
-        document.getElementById('modal').style.display = 'flex';
-        if(id) {
-            const c = clientes.find(x => x.id == id);
-            document.getElementById('modal-title').innerText = "Editar Cliente";
-            document.getElementById('edit-id').value = c.id;
-            document.getElementById('nome').value = c.nome;
-            document.getElementById('whatsapp').value = c.whatsapp;
-            document.getElementById('servidor').value = c.servidor || "";
-            document.getElementById('vencimento').value = c.vencimento;
-        } else {
-            limparForm();
-        }
-    }
-
-    function fecharModal() { document.getElementById('modal').style.display = 'none'; }
-    
-    function limparForm() {
-        document.getElementById('modal-title').innerText = "Novo Cliente";
-        document.getElementById('edit-id').value = '';
-        document.querySelectorAll('.modal-content input').forEach(i => i.value = '');
-        document.getElementById('servidor').value = '';
-    }
-
-    function salvar() {
-        const id = document.getElementById('edit-id').value || Date.now();
-        const novo = {
-            id,
-            nome: document.getElementById('nome').value,
-            whatsapp: document.getElementById('whatsapp').value,
-            servidor: document.getElementById('servidor').value,
-            vencimento: document.getElementById('vencimento').value
-        };
-
-        if(!novo.nome || !novo.vencimento || !novo.whatsapp) return alert("Nome, WhatsApp e Vencimento são obrigatórios!");
-
-        const idx = clientes.findIndex(c => c.id == id);
-        if(idx > -1) clientes[idx] = novo; else clientes.push(novo);
-
-        localStorage.setItem('og_flex_data', JSON.stringify(clientes));
-        fecharModal();
-        render();
-    }
-
-    function render() {
-        const busca = document.getElementById('busca').value.toLowerCase();
-        const grid = document.getElementById('client-grid');
-        grid.innerHTML = '';
-
-        clientes.filter(c => c.nome.toLowerCase().includes(busca)).forEach(c => {
-            const diff = new Date(c.vencimento) - new Date().setHours(0,0,0,0);
-            const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
-            
-            const servidorInfo = c.servidor ? c.servidor : "---";
-            const msgServidor = c.servidor ? ` do servidor ${c.servidor}` : "";
-            
-            const msg = window.encodeURIComponent(`Olá ${c.nome}! Sua assinatura${msgServidor} vence em ${dias} dias (${c.vencimento.split('-').reverse().join('/')}). Deseja renovar?`);
-            const zapLink = `https://wa.me/${c.whatsapp}?text=${msg}`;
-
-            grid.innerHTML += `
-                <div class="card">
-                    <span class="servidor-tag">${servidorInfo}</span>
-                    <h3>${c.nome}</h3>
-                    
-                    <div class="info-group">
-                        <div class="info-row">
-                            <span>Vencimento:</span>
-                            <span>${c.vencimento.split('-').reverse().join('/')}</span>
-                        </div>
-                        <div class="info-row">
-                            <span>Restam:</span>
-                            <span class="badge ${dias <= 3 ? 'alert' : ''}">${dias} dias</span>
-                        </div>
-                    </div>
-
-                    <div class="actions">
-                        <a href="${zapLink}" target="_blank" class="btn-action btn-whatsapp">
-                            Enviar Cobrança WhatsApp
-                        </a>
-                        <button class="btn-action btn-edit" onclick="abrirModal(${c.id})">Editar</button>
-                        <button class="btn-action btn-del" onclick="remover(${c.id})">Excluir</button>
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    function remover(id) {
-        if(confirm("Excluir cliente?")) {
-            clientes = clientes.filter(c => c.id != id);
+</div>clientes[idx] = novo; else clientes.push(novo);
+clientes = clientes.filter(c => c.id != id);
             localStorage.setItem('og_flex_data', JSON.stringify(clientes));
             render();
         }
@@ -194,5 +72,4 @@
     render();
 </script>
 
-</body>
-</html>
+    
