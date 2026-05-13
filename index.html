@@ -1,61 +1,254 @@
-                <h1>OG Manager</h1>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Gerenciador - Bruno Lemos</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary: #0062ff;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-light: #64748b;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; }
+
+        .container { max-width: 1200px; margin: auto; }
+
+        /* Cabeçalho Limpo */
+        .header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 20px; gap: 20px; flex-wrap: wrap;
+            background: white; padding: 20px; border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        
+        .brand-section { display: flex; flex-direction: column; gap: 2px; }
+        .titles h1 { font-size: 1.4rem; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+        .signature { font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 600; }
+        .signature span { color: var(--primary); }
+
+        /* Controles */
+        .controls-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .search-bar { flex: 2; position: relative; min-width: 280px; }
+        .search-bar input { 
+            width: 100%; padding: 14px 45px; border-radius: 12px; border: 2px solid #e2e8f0; 
+            outline: none; background: white; transition: 0.2s; font-size: 1rem;
+        }
+        .search-bar .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
+
+        .filter-select { flex: 1; min-width: 180px; }
+        select.styled-select { 
+            width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #e2e8f0; 
+            background: white; outline: none; cursor: pointer; font-weight: 600; color: var(--text);
+        }
+
+        /* Grid */
+        .client-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .card { 
+            background: var(--card-bg); border-radius: 16px; padding: 20px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 6px solid var(--primary);
+            transition: 0.2s;
+        }
+        .card.vence-hoje { border-left-color: var(--danger); animation: pulse 2s infinite; }
+        
+        .info-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 0.9rem; }
+        .badge { padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 0.75rem; }
+        .alert { background: #fee2e2; color: var(--danger); }
+        .success { background: #dcfce7; color: var(--success); }
+
+        .access-box { background: #f1f5f9; padding: 12px; border-radius: 10px; margin-top: 15px; font-size: 0.85rem; border: 1px solid #e2e8f0; }
+        .highlight { background: #fef08a; color: #854d0e; border-radius: 2px; }
+
+        .btn { padding: 12px 20px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-add { background: var(--primary); color: white; }
+        
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-action { padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+        .btn-renovar { background: #dcfce7; color: #166534; grid-column: span 2; }
+        .btn-edit { background: #f1f5f9; }
+        .btn-del { background: #fff1f2; color: var(--danger); }
+
+        #modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 450px; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="brand-section">
+            <div class="titles">
+                <h1>Next Gerenciador</h1>
                 <p class="signature">Gerenciado por <span>Bruno Lemos</span></p>
             </div>
         </div>
-        <div class="controls">
-            <div class="search-bar">
-                <input type="text" id="busca" placeholder="🔍 Buscar cliente..." oninput="render()">
-            </div>
-            <button class="btn btn-notif" onclick="solicitarNotificacao()">🔔 Ativar Avisos</button>
-            <button class="btn btn-add" onclick="abrirModal()">+ Novo Cliente</button>
+        <button class="btn btn-add" onclick="abrirModal()">+ Novo Cliente</button>
+    </div>
+
+    <div class="controls-row">
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="busca" placeholder="Pesquisar clientes..." oninput="render()">
+        </div>
+        <div class="filter-select">
+            <select id="ordenacao" class="styled-select" onchange="render()">
+                <option value="vencimento">Ordenar por Vencimento</option>
+                <option value="nome">Ordenar por Nome (A-Z)</option>
+                <option value="servidor">Ordenar por Servidor</option>
+            </select>
         </div>
     </div>
 
+    <div id="count-box" style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 15px; font-weight: 600;"></div>
     <div id="client-grid" class="client-grid"></div>
 </div>
 
-<div id="modal">
+<!-- Modal -->
+<div id="modal" onclick="if(event.target == this) fecharModal()">
     <div class="modal-content">
-        <h2 id="modal-title" style="margin-bottom:20px">Novo Cliente</h2>
+        <h2 style="margin-bottom: 20px;">📝 Cadastro de Cliente</h2>
         <input type="hidden" id="edit-id">
-        
-        <label style="font-size:0.8rem; font-weight:bold">👤 Nome do Cliente *</label>
-        <input type="text" id="nome" placeholder="Nome do cliente">
-        
-        <label style="font-size:0.8rem; font-weight:bold">🖥️ Servidor (Opcional)</label>
-        <select id="servidor">
-            <option value="">Nenhum</option>
-            <option value="Unitv">Unitv</option>
-            <option value="Blinder">Blinder</option>
-            <option value="Star Play">Star Play</option>
-        </select>
-        
-        <label style="font-size:0.8rem; font-weight:bold">📅 Data de Vencimento *</label>
-        <input type="date" id="vencimento">
+        <div style="margin-bottom: 15px;">
+            <label style="display:block; font-size:0.75rem; font-weight:700; color:var(--text-light); margin-bottom:5px">NOME COMPLETO</label>
+            <input type="text" id="nome" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px;">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="display:block; font-size:0.75rem; font-weight:700; color:var(--text-light); margin-bottom:5px">SISTEMA / SERVIDOR</label>
+            <select id="servidor" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px;">
+                <option value="Unitv">Unitv</option>
+                <option value="Blinder">Blinder</option>
+                <option value="Star Play">Star Play</option>
+            </select>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="display:block; font-size:0.75rem; font-weight:700; color:var(--text-light); margin-bottom:5px">DATA DE VENCIMENTO</label>
+            <input type="date" id="vencimento" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px;">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+            <div>
+                <label style="display:block; font-size:0.75rem; font-weight:700; color:var(--text-light); margin-bottom:5px">USUÁRIO</label>
+                <input type="text" id="login_cli" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px;">
+            </div>
+            <div>
+                <label style="display:block; font-size:0.75rem; font-weight:700; color:var(--text-light); margin-bottom:5px">SENHA</label>
+                <input type="text" id="senha_cli" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px;">
+            </div>
+        </div>
+        <button class="btn btn-add" onclick="salvar()" style="width:100%; justify-content: center;">Salvar Dados</button>
+    </div>
+</div>
 
-        <label style="font-size:0.8rem; font-weight:bold">🔑 Login (Opcional)</label>
-        <input type="text" id="login_cli">
-        
+<script>
+    let clientes = JSON.parse(localStorage.getItem('next_manager_data')) || [];
+
+    function abrirModal(id = null) {
+        document.getElementById('modal').style.display = 'flex';
+        if(id) {
+            const c = clientes.find(x => x.id == id);
+            document.getElementById('edit-id').value = c.id;
+            document.getElementById('nome').value = c.nome;
+            document.getElementById('servidor').value = c.servidor;
+            document.getElementById('vencimento').value = c.vencimento;
+            document.getElementById('login_cli').value = c.login_cli || "";
+            document.getElementById('senha_cli').value = c.senha_cli || "";
+        }
+    }
+
+    function fecharModal() { document.getElementById('modal').style.display = 'none'; limparForm(); }
+    function limparForm() { document.getElementById('edit-id').value = ''; document.querySelectorAll('.modal-content input').forEach(i => i.value = ''); }
+
+    function salvar() {
+        const id = document.getElementById('edit-id').value || Date.now();
+        const novo = { 
+            id: Number(id), 
+            nome: document.getElementById('nome').value.trim(), 
+            servidor: document.getElementById('servidor').value, 
+            vencimento: document.getElementById('vencimento').value,
+            login_cli: document.getElementById('login_cli').value.trim(),
+            senha_cli: document.getElementById('senha_cli').value.trim()
+        };
+        if(!novo.nome || !novo.vencimento) return alert("Preencha Nome e Vencimento!");
+        const idx = clientes.findIndex(c => c.id == id);
+        if(idx > -1) clientes[idx] = novo; else clientes.push(novo);
+        localStorage.setItem('next_manager_data', JSON.stringify(clientes));
+        fecharModal();
+        render();
+    }
+
+    function adicionar30Dias(id) {
+        const idx = clientes.findIndex(c => c.id == id);
+        let base = new Date(clientes[idx].vencimento + 'T00:00:00');
+        let hoje = new Date(); hoje.setHours(0,0,0,0);
+        if(base < hoje) base = hoje;
+        base.setDate(base.getDate() + 30);
+        clientes[idx].vencimento = base.toISOString().split('T')[0];
+        localStorage.setItem('next_manager_data', JSON.stringify(clientes));
+        render();
+    }
+
+    function highlightText(text, query) {
+        if (!query) return text;
+        const regex = new RegExp(`(${query})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    function render() {
+        const busca = document.getElementById('busca').value.toLowerCase();
+        const ord = document.getElementById('ordenacao').value;
+        const grid = document.getElementById('client-grid');
+        grid.innerHTML = '';
+
+        let filtrados = clientes.filter(c => 
+            c.nome.toLowerCase().includes(busca) || 
+            (c.servidor && c.servidor.toLowerCase().includes(busca)) ||
+            (c.login_cli && c.login_cli.toLowerCase().includes(busca))
+        );
+
+        filtrados.sort((a, b) => {
+            if (ord === 'vencimento') return new Date(a.vencimento) - new Date(b.vencimento);
+            if (ord === 'nome') return a.nome.localeCompare(b.nome);
+            if (ord === 'servidor') return (a.servidor || "").localeCompare(b.servidor || "");
+        });
+
+        document.getElementById('count-box').innerText = `${filtrados.length} clientes encontrados`;
+
+        filtrados.forEach(c => {
+            const dataVenc = new Date(c.vencimento + 'T00:00:00');
+            const hoje = new Date(); hoje.setHours(0,0,0,0);
+            const dias = Math.ceil((dataVenc - hoje) / (1000 * 60 * 60 * 24));
+
+            grid.innerHTML += `
+                <div class="card ${dias <= 0 ? 'vence-hoje' : ''}">
+                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--primary); text-transform: uppercase;">
+                        ${highlightText(c.servidor || 'Geral', busca)}
+                    </span>
+                    <h3 style="margin-bottom:10px">👤 ${highlightText(c.nome, busca)}</h3>
+                    <div class="info-row"><span>📅 Vencimento:</span> <strong>${c.vencimento.split('-').reverse().join('/')}</strong></div>
+                    <div class="info-row"><span>Status:</span> <span class="badge ${dias <= 0 ? 'alert' : 'success'}">${dias === 0 ? 'VENCE HOJE' : dias < 0 ? 'VENCIDO' : dias + ' dias'}</span></div>
                     
-                    <div class="info-row">
-                        <span>📅 Vencimento:</span>
-                        <strong>${c.vencimento.split('-').reverse().join('/')}</strong>
-                    </div>
-                    <div class="info-row">
-                        <span>Status:</span>
-                        <span class="badge ${dias <= 0 ? 'alert' : dias <= 3 ? 'warning' : ''}">
-                            ${dias === 0 ? 'VENCE HOJE' : dias < 0 ? 'EXPIRADO' : dias + ' dias restantes'}
-                        </span>
-                    </div>
-
                     ${(c.login_cli || c.senha_cli) ? `
                         <div class="access-box">
-                            ${c.login_cli ? `<div><strong>User:</strong> ${c.login_cli}</div>` : ''}
-                            ${c.senha_cli ? `<div><strong>Pass:</strong> ${c.senha_cli}</div>` : ''}
+                            ${c.login_cli ? `<div class="access-item"><span>👤</span> <strong>Login:</strong> ${highlightText(c.login_cli, busca)}</div>` : ''}
+                            ${c.senha_cli ? `<div class="access-item"><span>🔑</span> <strong>Senha:</strong> ${c.senha_cli}</div>` : ''}
                         </div>
                     ` : ''}
 
                     <div class="actions">
+                        <button class="btn-action btn-renovar" onclick="adicionar30Dias(${c.id})">⚡ Renovar +30 Dias</button>
                         <button class="btn-action btn-edit" onclick="abrirModal(${c.id})">Editar</button>
                         <button class="btn-action btn-del" onclick="remover(${c.id})">Excluir</button>
                     </div>
@@ -64,17 +257,9 @@
         });
     }
 
-    function remover(id) {
-        if(confirm("Excluir este cliente?")) {
-            clientes = clientes.filter(c => c.id != id);
-            localStorage.setItem('og_manager_data', JSON.stringify(clientes));
-            render();
-        }
-    }
-
+    function remover(id) { if(confirm("Deseja realmente excluir este cliente?")) { clientes = clientes.filter(c => c.id != id); localStorage.setItem('next_manager_data', JSON.stringify(clientes)); render(); } }
+    
     render();
-    verificarVencimentos();
 </script>
-
 </body>
-</htm
+</html>
