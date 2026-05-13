@@ -22,56 +22,33 @@
         body.theme-purple { --bg: #4a148c; --text: #ffffff; --card: #6a1b9a; --accent: #7b1fa2; --header-grad: linear-gradient(135deg, #7b1fa2, #4a148c); }
 
         body { 
-            background-color: var(--bg); 
-            color: var(--text); 
-            font-family: 'Segoe UI', sans-serif;
-            font-weight: 700; 
-            margin: 0; 
-            padding: 8px; 
-            transition: 0.3s; 
-            font-size: 0.82rem;
+            background-color: var(--bg); color: var(--text); 
+            font-family: 'Segoe UI', sans-serif; font-weight: 700; 
+            margin: 0; padding: 8px; transition: 0.3s; font-size: 0.82rem;
         }
 
         .header-next { 
-            text-align: center; 
-            padding: 15px 10px; 
-            background: var(--header-grad); 
-            color: white; 
-            border-radius: 12px; 
-            margin-bottom: 10px;
+            text-align: center; padding: 15px 10px; background: var(--header-grad); 
+            color: white; border-radius: 12px; margin-bottom: 10px;
         }
         .header-next span { font-size: 1.5rem; font-weight: 900; letter-spacing: 1px; }
 
-        .theme-bar {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 4px;
-            margin-bottom: 10px;
-        }
+        .theme-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 10px; }
         .theme-txt-btn {
-            background: var(--card);
-            color: var(--text);
-            border: 1px solid rgba(0,0,0,0.1);
-            padding: 8px 0;
-            border-radius: 6px;
-            font-size: 0.6rem;
-            cursor: pointer;
-            text-align: center;
-            text-transform: uppercase;
+            background: var(--card); color: var(--text); border: 1px solid rgba(0,0,0,0.1);
+            padding: 8px 0; border-radius: 6px; font-size: 0.6rem; cursor: pointer; text-align: center;
         }
         .theme-txt-btn.active { background: var(--accent); color: white; }
 
-        .link-manager-bar { margin-bottom: 10px; }
         .btn-paineis {
             width: 100%; padding: 10px; background: var(--accent); color: white;
-            border: none; border-radius: 8px; font-weight: 900; cursor: pointer;
+            border: none; border-radius: 8px; font-weight: 900; cursor: pointer; margin-bottom: 10px;
         }
 
         .controls { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
         input, select, .btn-action { 
             padding: 10px; border-radius: 8px; border: none; 
-            background: var(--card); color: var(--text); font-weight: 700;
-            font-size: 0.75rem;
+            background: var(--card); color: var(--text); font-weight: 700; font-size: 0.75rem;
         }
 
         #client-grid { display: grid; gap: 8px; }
@@ -81,23 +58,16 @@
         .card { 
             background: var(--card); padding: 10px; border-radius: 12px; 
             position: relative; border: 2px solid transparent;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            display: flex; flex-direction: column;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; flex-direction: column;
         }
         .border-green { border-color: var(--status-ok); }
         .border-orange { border-color: var(--status-alert); }
         .border-red { border-color: var(--status-danger); }
 
-        .info-row { 
-            margin-bottom: 3px; font-size: 0.72rem; 
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        }
+        .info-row { margin-bottom: 3px; font-size: 0.72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .info-row strong { color: var(--accent); }
         
-        .days-badge {
-            padding: 2px 6px; border-radius: 4px; font-size: 0.6rem;
-            color: #fff; align-self: flex-start; margin: 4px 0;
-        }
+        .days-badge { padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; color: #fff; align-self: flex-start; margin: 4px 0; }
         .bg-green { background: var(--status-ok); }
         .bg-orange { background: var(--status-alert); }
         .bg-red { background: var(--status-danger); }
@@ -105,8 +75,7 @@
         .action-area { display: flex; gap: 5px; margin-top: auto; align-items: center; }
         .btn-renovar { 
             flex: 1; background: #2ecc71; color: white; border: none; 
-            padding: 8px; border-radius: 6px; font-size: 0.65rem; cursor: pointer;
-            font-weight: 900;
+            padding: 8px; border-radius: 6px; font-size: 0.65rem; cursor: pointer; font-weight: 900;
         }
 
         .card-tools { position: absolute; top: 5px; right: 5px; display: flex; gap: 4px; }
@@ -117,7 +86,7 @@
             background: var(--card); padding: 20px; border-radius: 15px; z-index: 1000; 
             width: 85%; max-width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
         }
-        .modal input, .modal select { width: 100%; margin-bottom: 10px; padding: 10px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ddd; }
+        .modal input, .modal select { width: 100%; margin-bottom: 8px; padding: 10px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ddd; }
         
         .panel-item {
             display: flex; justify-content: space-between; align-items: center;
@@ -127,7 +96,6 @@
         .btn-conectar-link {
             background: #007bff; color: white; border: none; padding: 6px 12px;
             border-radius: 6px; font-size: 0.65rem; cursor: pointer; font-weight: 900;
-            text-decoration: none; display: inline-block;
         }
     </style>
 </head>
@@ -145,9 +113,7 @@
         <button class="theme-txt-btn" onclick="setTheme('purple', this)">Roxo</button>
     </div>
 
-    <div class="link-manager-bar">
-        <button class="btn-paineis" onclick="openModal('modalPaineis')">🔗 MEUS PAINÉIS / LINKS</button>
-    </div>
+    <button class="btn-paineis" onclick="openModal('modalPaineis')">🔗 MEUS PAINÉIS / LINKS</button>
 
     <div class="controls">
         <input type="text" id="busca" oninput="render()" placeholder="🔍 BUSCAR..." style="flex: 1; min-width: 150px;">
@@ -165,6 +131,8 @@
     <!-- MODAL CLIENTE -->
     <div id="modalCliente" class="modal">
         <h3 style="margin-top:0; text-align:center;">DADOS CLIENTE</h3>
+        <input type="text" id="m3uInput" oninput="parseM3U()" placeholder="COLE O LINK M3U AQUI PARA AUTO-PREENCHER" style="background:#eefaff; border: 1px dashed #007bff;">
+        <hr style="opacity:0.3">
         <input type="hidden" id="editId">
         <input type="text" id="cliNome" placeholder="NOME">
         <input type="text" id="cliZap" placeholder="WHATSAPP (EX: 5555999999999)">
@@ -219,6 +187,7 @@
 
         function openModalNovo() {
             document.getElementById('editId').value = "";
+            document.getElementById('m3uInput').value = "";
             document.getElementById('cliNome').value = "";
             document.getElementById('cliZap').value = "";
             document.getElementById('cliLogin').value = "";
@@ -227,12 +196,28 @@
             openModal('modalCliente');
         }
 
+        // --- FUNÇÃO M3U ---
+        function parseM3U() {
+            const urlStr = document.getElementById('m3uInput').value;
+            try {
+                const url = new URL(urlStr);
+                const user = url.searchParams.get("username") || url.searchParams.get("user");
+                const pass = url.searchParams.get("password") || url.searchParams.get("pass");
+                
+                if(user) document.getElementById('cliLogin').value = user;
+                if(pass) document.getElementById('cliSenha').value = pass;
+                
+                // Tenta identificar o servidor pelo host
+                if(urlStr.toLowerCase().includes('unitv')) document.getElementById('cliServidor').value = 'UNITV';
+            } catch(e) {}
+        }
+
+        // --- LINKS / SERVIDORES ---
         function addLink() {
             const n = document.getElementById('linkNome').value.toUpperCase();
             let u = document.getElementById('linkUrl').value;
             if(!n || !u) return;
             if (!u.startsWith('http')) u = 'https://' + u;
-            
             linksExternos.push({ id: Date.now(), nome: n, url: u });
             localStorage.setItem('next_links', JSON.stringify(linksExternos));
             document.getElementById('linkNome').value = '';
@@ -261,6 +246,7 @@
             });
         }
 
+        // --- CLIENTES ---
         function saveCliente() {
             const id = document.getElementById('editId').value;
             const obj = {
@@ -349,7 +335,7 @@
                         <div class="days-badge ${bg}">${dias <= 0 ? 'VENCIDO' : dias + ' DIAS'}</div>
                         <div class="action-area">
                             <button class="btn-renovar" onclick="renovar(${c.id})">RENOVAR</button>
-                            <a href="https://api.whatsapp.com/send?phone=${zapNum}" target="_blank" style="display:flex; align-items:center;">
+                            <a href="https://api.whatsapp.com/send?phone=${zapNum}" target="_blank" style="display:flex;">
                                 <svg width="22" height="22" viewBox="0 0 448 512"><path fill="#25D366" d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18s-8.8-2.8-12.4 2.8-14.1 18-17.2 21.6-6.3 4.1-11.8 1.3c-5.5-2.8-23.3-8.6-44.4-27.5-16.4-14.6-27.4-32.7-30.6-38.2s-.3-8.5 2.5-11.2c2.5-2.5 5.5-6.4 8.3-9.6s3.7-5.5 5.5-9.1.9-6.7-.5-9.6-12.4-29.9-17-41.1c-4.5-10.9-9.1-9.4-12.4-9.6l-10.6-.2c-3.7 0-9.6 1.4-14.7 6.9-5.1 5.5-19.4 19-19.4 46.3s19.8 53.8 22.6 57.5c2.8 3.7 39.1 59.7 94.8 83.8 13.2 5.7 23.5 9.2 31.6 11.8 13.3 4.2 25.4 3.6 35 2.2 10.7-1.6 32.8-13.4 37.4-26.4s4.6-24.1 3.2-26.4c-1.4-2.5-5.1-3.9-10.6-6.6z"/></svg>
                             </a>
                         </div>
