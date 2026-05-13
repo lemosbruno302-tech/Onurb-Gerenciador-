@@ -118,6 +118,17 @@
             width: 85%; max-width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
         }
         .modal input, .modal select { width: 100%; margin-bottom: 10px; padding: 10px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ddd; }
+        
+        .panel-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px; border-bottom: 1px solid rgba(0,0,0,0.1);
+            background: rgba(0,0,0,0.02); margin-bottom: 5px; border-radius: 5px;
+        }
+        .btn-conectar-link {
+            background: #007bff; color: white; border: none; padding: 6px 12px;
+            border-radius: 6px; font-size: 0.65rem; cursor: pointer; font-weight: 900;
+            text-decoration: none; display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -156,7 +167,7 @@
         <h3 style="margin-top:0; text-align:center;">DADOS CLIENTE</h3>
         <input type="hidden" id="editId">
         <input type="text" id="cliNome" placeholder="NOME">
-        <input type="text" id="cliZap" placeholder="WHATSAPP">
+        <input type="text" id="cliZap" placeholder="WHATSAPP (EX: 5555999999999)">
         <select id="cliServidor">
             <option value="UNITV">UNITV</option>
             <option value="STARPLAY">STARPLAY</option>
@@ -172,12 +183,12 @@
 
     <!-- MODAL LINKS -->
     <div id="modalPaineis" class="modal">
-        <h3 style="margin-top:0; text-align:center;">LINKS SALVOS</h3>
-        <div id="listaLinks" style="max-height: 200px; overflow-y: auto;"></div>
+        <h3 style="margin-top:0; text-align:center;">SERVIDORES SALVOS</h3>
+        <div id="listaLinks" style="max-height: 200px; overflow-y: auto; margin-bottom:10px;"></div>
         <hr>
-        <input type="text" id="linkNome" placeholder="NOME PAINEL">
-        <input type="text" id="linkUrl" placeholder="LINK">
-        <button class="btn-renovar" style="width:100%; margin-bottom:5px; padding:10px;" onclick="addLink()">SALVAR LINK</button>
+        <input type="text" id="linkNome" placeholder="NOME DO SERVIDOR">
+        <input type="text" id="linkUrl" placeholder="LINK (HTTPS://...)">
+        <button class="btn-renovar" style="width:100%; margin-bottom:5px; padding:10px;" onclick="addLink()">ADICIONAR SERVIDOR</button>
         <button class="btn-action" style="width:100%;" onclick="closeModal('modalPaineis')">FECHAR</button>
     </div>
 
@@ -200,7 +211,10 @@
             render();
         }
 
-        function openModal(id) { document.getElementById(id).style.display = 'block'; if(id === 'modalPaineis') renderLinks(); }
+        function openModal(id) { 
+            document.getElementById(id).style.display = 'block'; 
+            if(id === 'modalPaineis') renderLinks(); 
+        }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         function openModalNovo() {
@@ -211,6 +225,40 @@
             document.getElementById('cliSenha').value = "";
             document.getElementById('cliVenc').value = new Date().toISOString().split('T')[0];
             openModal('modalCliente');
+        }
+
+        function addLink() {
+            const n = document.getElementById('linkNome').value.toUpperCase();
+            let u = document.getElementById('linkUrl').value;
+            if(!n || !u) return;
+            if (!u.startsWith('http')) u = 'https://' + u;
+            
+            linksExternos.push({ id: Date.now(), nome: n, url: u });
+            localStorage.setItem('next_links', JSON.stringify(linksExternos));
+            document.getElementById('linkNome').value = '';
+            document.getElementById('linkUrl').value = '';
+            renderLinks();
+        }
+
+        function removeLink(id) {
+            linksExternos = linksExternos.filter(l => l.id !== id);
+            localStorage.setItem('next_links', JSON.stringify(linksExternos));
+            renderLinks();
+        }
+
+        function renderLinks() {
+            const div = document.getElementById('listaLinks');
+            div.innerHTML = '';
+            linksExternos.forEach(l => {
+                div.innerHTML += `
+                <div class="panel-item">
+                    <span>${l.nome}</span>
+                    <div style="display:flex; gap:5px; align-items:center;">
+                        <button class="btn-conectar-link" onclick="window.open('${l.url}', '_blank')">🔗 CONECTAR</button>
+                        <button onclick="removeLink(${l.id})" style="border:none; background:none; cursor:pointer;">🗑️</button>
+                    </div>
+                </div>`;
+            });
         }
 
         function saveCliente() {
@@ -285,6 +333,8 @@
                 if(dias <= 0) { cor = "border-red"; bg = "bg-red"; }
                 else if(dias <= 7) { cor = "border-orange"; bg = "bg-orange"; }
 
+                const zapNum = c.whatsapp.replace(/\D/g,'');
+
                 grid.innerHTML += `
                     <div class="card ${cor}">
                         <div class="card-tools">
@@ -299,40 +349,12 @@
                         <div class="days-badge ${bg}">${dias <= 0 ? 'VENCIDO' : dias + ' DIAS'}</div>
                         <div class="action-area">
                             <button class="btn-renovar" onclick="renovar(${c.id})">RENOVAR</button>
-                            <button onclick="window.open('https://wa.me/${c.whatsapp.replace(/\D/g,'')}', '_blank')" style="background:none; border:none; padding:0;">
-                                <svg width="20" height="20" viewBox="0 0 448 512"><path fill="#25D366" d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18s-8.8-2.8-12.4 2.8-14.1 18-17.2 21.6-6.3 4.1-11.8 1.3c-5.5-2.8-23.3-8.6-44.4-27.5-16.4-14.6-27.4-32.7-30.6-38.2s-.3-8.5 2.5-11.2c2.5-2.5 5.5-6.4 8.3-9.6s3.7-5.5 5.5-9.1.9-6.7-.5-9.6-12.4-29.9-17-41.1c-4.5-10.9-9.1-9.4-12.4-9.6l-10.6-.2c-3.7 0-9.6 1.4-14.7 6.9-5.1 5.5-19.4 19-19.4 46.3s19.8 53.8 22.6 57.5c2.8 3.7 39.1 59.7 94.8 83.8 13.2 5.7 23.5 9.2 31.6 11.8 13.3 4.2 25.4 3.6 35 2.2 10.7-1.6 32.8-13.4 37.4-26.4s4.6-24.1 3.2-26.4c-1.4-2.5-5.1-3.9-10.6-6.6z"/></svg>
-                            </button>
+                            <a href="https://api.whatsapp.com/send?phone=${zapNum}" target="_blank" style="display:flex; align-items:center;">
+                                <svg width="22" height="22" viewBox="0 0 448 512"><path fill="#25D366" d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18s-8.8-2.8-12.4 2.8-14.1 18-17.2 21.6-6.3 4.1-11.8 1.3c-5.5-2.8-23.3-8.6-44.4-27.5-16.4-14.6-27.4-32.7-30.6-38.2s-.3-8.5 2.5-11.2c2.5-2.5 5.5-6.4 8.3-9.6s3.7-5.5 5.5-9.1.9-6.7-.5-9.6-12.4-29.9-17-41.1c-4.5-10.9-9.1-9.4-12.4-9.6l-10.6-.2c-3.7 0-9.6 1.4-14.7 6.9-5.1 5.5-19.4 19-19.4 46.3s19.8 53.8 22.6 57.5c2.8 3.7 39.1 59.7 94.8 83.8 13.2 5.7 23.5 9.2 31.6 11.8 13.3 4.2 25.4 3.6 35 2.2 10.7-1.6 32.8-13.4 37.4-26.4s4.6-24.1 3.2-26.4c-1.4-2.5-5.1-3.9-10.6-6.6z"/></svg>
+                            </a>
                         </div>
                     </div>
                 `;
-            });
-        }
-
-        function addLink() {
-            const n = document.getElementById('linkNome').value;
-            const u = document.getElementById('linkUrl').value;
-            if(!n || !u) return;
-            linksExternos.push({ id: Date.now(), nome: n, url: u });
-            localStorage.setItem('next_links', JSON.stringify(linksExternos));
-            document.getElementById('linkNome').value = '';
-            document.getElementById('linkUrl').value = '';
-            renderLinks();
-        }
-
-        function removeLink(id) {
-            linksExternos = linksExternos.filter(l => l.id !== id);
-            localStorage.setItem('next_links', JSON.stringify(linksExternos));
-            renderLinks();
-        }
-
-        function renderLinks() {
-            const div = document.getElementById('listaLinks');
-            div.innerHTML = '';
-            linksExternos.forEach(l => {
-                div.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;">
-                    <span style="color:var(--accent); cursor:pointer;" onclick="window.open('${l.url}', '_blank')">${l.nome}</span>
-                    <button onclick="removeLink(${l.id})" style="border:none; background:none;">❌</button>
-                </div>`;
             });
         }
 
