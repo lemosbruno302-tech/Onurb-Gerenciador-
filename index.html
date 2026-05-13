@@ -15,6 +15,7 @@
             --text-light: #64748b;
             --danger: #ef4444;
             --success: #10b981;
+            --whatsapp: #25d366;
             --border: #e2e8f0;
         }
 
@@ -39,6 +40,8 @@
         .titles h1 { font-size: 1.1rem; font-weight: 800; color: var(--text); }
         .signature { font-size: 0.6rem; color: var(--text-light); text-transform: uppercase; font-weight: 600; }
         .signature span { color: var(--primary); }
+
+        .header-actions { display: flex; gap: 8px; }
 
         .controls-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
         
@@ -85,16 +88,22 @@
         .access-box { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin-top: 8px; font-size: 0.75rem; border: 1px solid var(--border); }
         .access-box div { margin: 2px 0; }
         
-        .btn-add { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
+        .btn-import { background: var(--text-light); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
         
-        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 10px; }
+        .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-top: 10px; }
         .btn-action { padding: 8px; border: none; border-radius: 6px; font-weight: 600; font-size: 0.7rem; cursor: pointer; background: var(--border); color: var(--text); }
-        .btn-renovar { background: var(--success); color: white; grid-column: span 2; }
+        .btn-renovar { background: var(--success); color: white; grid-column: span 3; margin-bottom: 2px; }
+        .btn-zap { background: var(--whatsapp); color: white; }
         .btn-del { background: var(--danger); color: white; }
 
-        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 100; padding: 15px; }
-        .modal-content { background: var(--card-bg); color: var(--text); padding: 20px; border-radius: 15px; width: 100%; max-width: 400px; border: 1px solid var(--border); }
-        input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; background: var(--bg); color: var(--text); outline: none; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 100; padding: 15px; }
+        .modal-content { background: var(--card-bg); color: var(--text); padding: 20px; border-radius: 15px; width: 100%; max-width: 400px; border: 1px solid var(--border); overflow-y: auto; max-height: 90vh; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; background: var(--bg); color: var(--text); outline: none; }
+        
+        .import-tabs { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 5px; overflow-x: auto; }
+        .tab-btn { background: transparent; border: none; color: var(--text-light); padding: 5px 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .tab-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
     </style>
 </head>
 <body class="theme-black">
@@ -105,7 +114,10 @@
             <h1>Next Gerenciador</h1>
             <p class="signature">Por <span>Bruno Lemos</span></p>
         </div>
-        <button class="btn-add" onclick="abrirModal()">+ Novo</button>
+        <div class="header-actions">
+            <button class="btn-import" onclick="abrirModalImport()">Importar</button>
+            <button class="btn-add" onclick="abrirModal()">+ Novo</button>
+        </div>
     </div>
 
     <div class="controls-row">
@@ -141,12 +153,13 @@
     <div id="client-grid" class="client-grid"></div>
 </div>
 
-<!-- Modal -->
-<div id="modal" onclick="if(event.target == this) fecharModal()">
+<!-- Modal Cadastro -->
+<div id="modal" class="modal" onclick="if(event.target == this) fecharModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <h3>Dados do Cliente</h3><br>
         <input type="hidden" id="edit-id">
         <input type="text" id="nome" placeholder="Nome do Cliente">
+        <input type="tel" id="whatsapp_cli" placeholder="WhatsApp (ex: 555599999999)">
         <select id="servidor-select">
             <option value="Unitv">Unitv</option>
             <option value="Blinder">Blinder</option>
@@ -162,6 +175,28 @@
     </div>
 </div>
 
+<!-- Modal Importação -->
+<div id="modalImport" class="modal" onclick="if(event.target == this) fecharModalImport()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h3>Importar Clientes</h3>
+        <div class="import-tabs">
+            <button class="tab-btn active" id="tab-json" onclick="switchTab('json')">JSON</button>
+            <button class="tab-btn" id="tab-m3u" onclick="switchTab('m3u')">Lista M3U</button>
+        </div>
+
+        <div id="container-json">
+            <textarea id="jsonInput" style="height: 100px;" placeholder='Cole o código JSON aqui...'></textarea>
+            <button class="btn-add" onclick="importarJSON()" style="width:100%;">Processar Código</button>
+        </div>
+
+        <div id="container-m3u" style="display: none;">
+            <input type="url" id="m3uInput" placeholder="URL da lista M3U">
+            <input type="text" id="m3uNome" placeholder="Nome do Cliente">
+            <button class="btn-add" onclick="importarM3U()" style="width:100%;">Adicionar via M3U</button>
+        </div>
+    </div>
+</div>
+
 <script>
     let clientes = JSON.parse(localStorage.getItem('next_manager_data')) || [];
     let vistaAtual = 'completa';
@@ -169,7 +204,7 @@
     function setTheme(theme) {
         document.body.className = theme === 'light' ? '' : 'theme-' + theme;
         document.querySelectorAll('.theme-toggle .toggle-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`theme-${theme}`).classList.add('active');
+        if(document.getElementById(`theme-${theme}`)) document.getElementById(`theme-${theme}`).classList.add('active');
         localStorage.setItem('next_theme_bruno', theme);
     }
 
@@ -186,23 +221,65 @@
             const c = clientes.find(x => x.id == id);
             document.getElementById('edit-id').value = c.id;
             document.getElementById('nome').value = c.nome;
+            document.getElementById('whatsapp_cli').value = c.whatsapp_cli || "";
             document.getElementById('servidor-select').value = c.servidor;
             document.getElementById('vencimento').value = c.vencimento;
             document.getElementById('login_cli').value = c.login_cli || "";
             document.getElementById('senha_cli').value = c.senha_cli || "";
         } else {
             document.getElementById('edit-id').value = '';
-            document.querySelectorAll('.modal-content input').forEach(i => i.value = '');
+            document.querySelectorAll('#modal input').forEach(i => i.value = '');
+            document.getElementById('vencimento').value = new Date().toISOString().split('T')[0];
         }
     }
 
     function fecharModal() { document.getElementById('modal').style.display = 'none'; }
+    function abrirModalImport() { document.getElementById('modalImport').style.display = 'flex'; }
+    function fecharModalImport() { document.getElementById('modalImport').style.display = 'none'; }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        document.getElementById('container-json').style.display = tab === 'json' ? 'block' : 'none';
+        document.getElementById('container-m3u').style.display = tab === 'm3u' ? 'block' : 'none';
+    }
+
+    function enviarZap(id) {
+        const c = clientes.find(x => x.id == id);
+        if(!c.whatsapp_cli) return alert("Número de WhatsApp não cadastrado!");
+        
+        const dataFormatada = c.vencimento.split('-').reverse().join('/');
+        const mensagem = `Olá ${c.nome}! Passando para lembrar que seu acesso vence dia ${dataFormatada}. Para renovar e não ficar sem o serviço, entre em contato! 🚀`;
+        
+        const url = `https://api.whatsapp.com/send?phone=${c.whatsapp_cli.replace(/\D/g,'')}&text=${encodeURIComponent(mensagem)}`;
+        window.open(url, '_blank');
+    }
+
+    function importarM3U() {
+        const urlString = document.getElementById('m3uInput').value;
+        const nome = document.getElementById('m3uNome').value || "Cliente M3U";
+        if(!urlString) return;
+        try {
+            const url = new URL(urlString);
+            const user = url.searchParams.get("username") || url.searchParams.get("user") || "";
+            const pass = url.searchParams.get("password") || url.searchParams.get("pass") || "";
+            let venc = url.searchParams.get("exp_date") || new Date().toISOString().split('T')[0];
+            
+            clientes.push({
+                id: Date.now(), nome, servidor: "M3U", vencimento: venc,
+                login_cli: user, senha_cli: pass, whatsapp_cli: ""
+            });
+            localStorage.setItem('next_manager_data', JSON.stringify(clientes));
+            fecharModalImport(); render();
+        } catch(e) { alert("URL inválida"); }
+    }
 
     function salvar() {
         const id = document.getElementById('edit-id').value || Date.now();
         const novo = { 
             id: Number(id), 
             nome: document.getElementById('nome').value, 
+            whatsapp_cli: document.getElementById('whatsapp_cli').value,
             servidor: document.getElementById('servidor-select').value, 
             vencimento: document.getElementById('vencimento').value,
             login_cli: document.getElementById('login_cli').value,
@@ -212,8 +289,7 @@
         const idx = clientes.findIndex(c => c.id == id);
         if(idx > -1) clientes[idx] = novo; else clientes.push(novo);
         localStorage.setItem('next_manager_data', JSON.stringify(clientes));
-        fecharModal();
-        render();
+        fecharModal(); render();
     }
 
     function renovar(id) {
@@ -230,53 +306,39 @@
         const ord = document.getElementById('ordenacao').value;
         const grid = document.getElementById('client-grid');
         grid.innerHTML = '';
-        
         vistaAtual === 'compacta' ? grid.classList.add('compact-view') : grid.classList.remove('compact-view');
 
         let filtrados = clientes.filter(c => c.nome.toLowerCase().includes(busca));
-
-        filtrados.sort((a, b) => {
-            if (ord === 'vencimento') return new Date(a.vencimento) - new Date(b.vencimento);
-            return a.nome.localeCompare(b.nome);
-        });
+        filtrados.sort((a, b) => ord === 'vencimento' ? new Date(a.vencimento) - new Date(b.vencimento) : a.nome.localeCompare(b.nome));
 
         filtrados.forEach(c => {
-            const dataVenc = new Date(c.vencimento + 'T00:00:00');
-            const hoje = new Date(); hoje.setHours(0,0,0,0);
-            const dias = Math.ceil((dataVenc - hoje) / (1000 * 60 * 60 * 24));
-            
-            // Lógica para os rótulos de Usuário e Senha
-            const labelUser = vistaAtual === 'completa' ? 'Usuário' : 'U';
-            const labelPass = vistaAtual === 'completa' ? 'Senha' : 'S';
-
+            const dias = Math.ceil((new Date(c.vencimento + 'T00:00:00') - new Date().setHours(0,0,0,0)) / (1000 * 60 * 60 * 24));
             grid.innerHTML += `
                 <div class="card" style="${dias <= 0 ? 'border-left-color: #ef4444' : ''}">
                     <div style="font-size: 0.55rem; font-weight: 800; color: var(--primary); text-transform: uppercase;">${c.servidor}</div>
-                    <h3 style="margin: 4px 0">👤 ${c.nome}</h3>
+                    <h3>👤 ${c.nome}</h3>
                     <div class="info-row"><span>Venc:</span> <strong>${c.vencimento.split('-').reverse().join('/')}</strong></div>
                     <div class="info-row"><span>Dias:</span> <span class="badge ${dias <= 0 ? 'alert' : 'success'}">${dias <= 0 ? 'VENCIDO' : dias + 'd'}</span></div>
                     
-                    ${(vistaAtual !== 'simples') ? `
+                    ${vistaAtual !== 'simples' ? `
                         <div class="access-box">
-                            <div><strong>${labelUser}:</strong> ${c.login_cli || '-'}</div>
-                            <div><strong>${labelPass}:</strong> ${c.senha_cli || '-'}</div>
+                            <div><strong>U:</strong> ${c.login_cli || '-'} | <strong>S:</strong> ${c.senha_cli || '-'}</div>
+                            ${c.whatsapp_cli ? `<div style="color:var(--whatsapp)"><strong>Zap:</strong> ${c.whatsapp_cli}</div>` : ''}
                         </div>
                     ` : ''}
 
                     <div class="actions">
                         <button class="btn-action btn-renovar" onclick="renovar(${c.id})">⚡ RENOVAR 30 DIAS</button>
+                        <button class="btn-action btn-zap" onclick="enviarZap(${c.id})">WHATSAPP</button>
                         <button class="btn-action" onclick="abrirModal(${c.id})">EDITAR</button>
                         <button class="btn-action btn-del" onclick="remover(${c.id})">EXCLUIR</button>
                     </div>
-                </div>
-            `;
+                </div>`;
         });
     }
 
     function remover(id) { if(confirm("Excluir cliente?")) { clientes = clientes.filter(c => c.id != id); localStorage.setItem('next_manager_data', JSON.stringify(clientes)); render(); } }
-    
-    const savedTheme = localStorage.getItem('next_theme_bruno') || 'black';
-    setTheme(savedTheme);
+    setTheme(localStorage.getItem('next_theme_bruno') || 'black');
     render();
 </script>
 </body>
