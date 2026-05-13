@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Next Gerenciador - Bruno Lemos</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
@@ -15,177 +15,168 @@
             --text-light: #64748b;
             --danger: #ef4444;
             --success: #10b981;
+            --border: #e2e8f0;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; }
+        /* Temas Sólidos */
+        body.theme-black { --bg: #000000; --card-bg: #1a1a1a; --text: #ffffff; --text-light: #a1a1aa; --border: #333333; }
+        body.theme-red { --bg: #450a0a; --card-bg: #7f1d1d; --text: #fef2f2; --text-light: #fca5a5; --border: #991b1b; }
+        body.theme-green { --bg: #064e3b; --card-bg: #065f46; --text: #ecfdf5; --text-light: #6ee7b7; --border: #047857; }
+        body.theme-blue { --bg: #0f172a; --card-bg: #1e293b; --text: #f1f5f9; --text-light: #94a3b8; --border: #333333; }
+        body.theme-dark { --bg: #1e293b; --card-bg: #334155; --text: #f1f5f9; --text-light: #94a3b8; --border: #475569; }
 
-        .container { max-width: 1200px; margin: auto; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); padding: 10px; line-height: 1.3; transition: all 0.3s; }
+
+        .container { width: 100%; max-width: 1200px; margin: auto; }
 
         .header { 
             display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 20px; gap: 20px; flex-wrap: wrap;
-            background: white; padding: 20px; border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-bottom: 12px; background: var(--card-bg); padding: 12px; border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid var(--border);
         }
         
-        .brand-section { display: flex; flex-direction: column; gap: 2px; }
-        .titles h1 { font-size: 1.4rem; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
-        .signature { font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 600; }
+        .titles h1 { font-size: 1.1rem; font-weight: 800; color: var(--text); }
+        .signature { font-size: 0.6rem; color: var(--text-light); text-transform: uppercase; font-weight: 600; }
         .signature span { color: var(--primary); }
 
-        /* Controles */
-        .controls-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-        .search-bar { flex: 2; position: relative; min-width: 250px; }
+        .controls-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        
+        .search-group { display: flex; gap: 6px; width: 100%; }
+        .search-bar { flex: 1; }
         .search-bar input { 
-            width: 100%; padding: 14px 45px; border-radius: 12px; border: 2px solid #e2e8f0; 
-            outline: none; background: white; transition: 0.2s; font-size: 1rem;
-        }
-        .search-bar .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
-
-        .filter-select { flex: 1; min-width: 150px; }
-        select.styled-select { 
-            width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #e2e8f0; 
-            background: white; outline: none; cursor: pointer; font-weight: 600; color: var(--text);
+            width: 100%; padding: 10px; border-radius: 8px; border: 2px solid var(--border); 
+            outline: none; background: var(--card-bg); color: var(--text);
         }
 
-        .view-toggle {
-            display: flex; background: #e2e8f0; padding: 4px; border-radius: 10px; gap: 4px;
+        .filter-select select { 
+            padding: 10px; border-radius: 8px; border: 2px solid var(--border); 
+            background: var(--card-bg); font-size: 0.8rem; color: var(--text); font-weight: 600;
         }
+
+        .settings-grid { display: flex; flex-direction: column; gap: 8px; }
+        
+        .view-toggle, .theme-toggle {
+            display: grid; grid-template-columns: repeat(3, 1fr); background: var(--border); padding: 3px; border-radius: 8px; gap: 3px;
+        }
+        .theme-toggle { grid-template-columns: repeat(3, 1fr); }
+
         .toggle-btn {
-            padding: 8px 12px; border: none; border-radius: 7px; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: 0.2s; color: var(--text-light);
+            padding: 8px 2px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.6rem; font-weight: 700; color: var(--text-light); background: transparent; transition: 0.2s;
         }
-        .toggle-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .toggle-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 
-        /* Grid */
-        .client-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .client-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .client-grid.compact-view { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+
         .card { 
-            background: var(--card-bg); border-radius: 16px; padding: 20px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 6px solid var(--primary);
-            transition: 0.2s;
+            background: var(--card-bg); border-radius: 10px; padding: 15px; 
+            border-left: 4px solid var(--primary); border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
         }
-        .card.vence-hoje { border-left-color: var(--danger); animation: pulse 2s infinite; }
+
+        .compact-view .card { padding: 8px; font-size: 0.7rem; border-left-width: 3px; }
+        .compact-view .card h3 { font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .info-row { display: flex; justify-content: space-between; margin: 4px 0; font-size: 0.8rem; }
+        .badge { padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 0.65rem; }
+        .alert { background: #fee2e2; color: #991b1b; }
+        .success { background: #dcfce7; color: #166534; }
+
+        .access-box { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin-top: 8px; font-size: 0.75rem; border: 1px solid var(--border); }
+        .access-box div { margin: 2px 0; }
         
-        .info-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 0.9rem; }
-        .badge { padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 0.75rem; }
-        .alert { background: #fee2e2; color: var(--danger); }
-        .success { background: #dcfce7; color: var(--success); }
-
-        .access-box { background: #f1f5f9; padding: 12px; border-radius: 10px; margin-top: 15px; font-size: 0.85rem; border: 1px solid #e2e8f0; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; }
         
-        .btn { padding: 12px 20px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-add { background: var(--primary); color: white; }
-        
-        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn-action { padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
-        .btn-renovar { background: #dcfce7; color: #166534; grid-column: span 2; }
-        .btn-edit { background: #f1f5f9; }
-        .btn-del { background: #fff1f2; color: var(--danger); }
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 10px; }
+        .btn-action { padding: 8px; border: none; border-radius: 6px; font-weight: 600; font-size: 0.7rem; cursor: pointer; background: var(--border); color: var(--text); }
+        .btn-renovar { background: var(--success); color: white; grid-column: span 2; }
+        .btn-del { background: var(--danger); color: white; }
 
-        #modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 100; }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 450px; }
-
-        input, select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; outline: none; }
-        label { display:block; font-size:0.75rem; font-weight:700; color:var(--text-light); margin-bottom:5px; margin-top: 10px; }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
+        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 100; padding: 15px; }
+        .modal-content { background: var(--card-bg); color: var(--text); padding: 20px; border-radius: 15px; width: 100%; max-width: 400px; border: 1px solid var(--border); }
+        input, select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; background: var(--bg); color: var(--text); outline: none; }
     </style>
 </head>
-<body>
+<body class="theme-black">
 
 <div class="container">
     <div class="header">
-        <div class="brand-section">
-            <div class="titles">
-                <h1>Next Gerenciador</h1>
-                <p class="signature">Gerenciado por <span>Bruno Lemos</span></p>
-            </div>
+        <div class="titles">
+            <h1>Next Gerenciador</h1>
+            <p class="signature">Por <span>Bruno Lemos</span></p>
         </div>
-        <button class="btn btn-add" onclick="abrirModal()">+ Novo Cliente</button>
+        <button class="btn-add" onclick="abrirModal()">+ Novo</button>
     </div>
 
     <div class="controls-row">
-        <div class="search-bar">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="busca" placeholder="Pesquisar..." oninput="render()">
+        <div class="search-group">
+            <div class="search-bar">
+                <input type="text" id="busca" placeholder="Buscar cliente..." oninput="render()">
+            </div>
+            <div class="filter-select">
+                <select id="ordenacao" onchange="render()">
+                    <option value="vencimento">📅 Venc.</option>
+                    <option value="nome">🔤 Nome</option>
+                </select>
+            </div>
         </div>
         
-        <div class="filter-select">
-            <select id="ordenacao" class="styled-select" onchange="render()">
-                <option value="vencimento">Vencimento</option>
-                <option value="nome">Nome (A-Z)</option>
-                <option value="servidor">Servidor</option>
-            </select>
-        </div>
-
-        <div class="view-toggle">
-            <button id="view-completa" class="toggle-btn active" onclick="setView('completa')">Completa</button>
-            <button id="view-simples" class="toggle-btn" onclick="setView('simples')">Simples</button>
+        <div class="settings-grid">
+            <div class="view-toggle">
+                <button id="btn-completa" class="toggle-btn active" onclick="alterarView('completa')">Completa</button>
+                <button id="btn-simples" class="toggle-btn" onclick="alterarView('simples')">Simples</button>
+                <button id="btn-compacta" class="toggle-btn" onclick="alterarView('compacta')">2 Colunas</button>
+            </div>
+            <div class="theme-toggle">
+                <button id="theme-black" class="toggle-btn active" onclick="setTheme('black')">Preto</button>
+                <button id="theme-red" class="toggle-btn" onclick="setTheme('red')">Vermelho</button>
+                <button id="theme-green" class="toggle-btn" onclick="setTheme('green')">Verde</button>
+                <button id="theme-blue" class="toggle-btn" onclick="setTheme('blue')">Azul</button>
+                <button id="theme-dark" class="toggle-btn" onclick="setTheme('dark')">Dark</button>
+                <button id="theme-light" class="toggle-btn" onclick="setTheme('light')">Claro</button>
+            </div>
         </div>
     </div>
 
-    <div id="count-box" style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 15px; font-weight: 600;"></div>
     <div id="client-grid" class="client-grid"></div>
 </div>
 
 <!-- Modal -->
 <div id="modal" onclick="if(event.target == this) fecharModal()">
-    <div class="modal-content">
-        <h2 style="margin-bottom: 10px;">📝 Dados do Cliente</h2>
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h3>Dados do Cliente</h3><br>
         <input type="hidden" id="edit-id">
-        
-        <label>NOME</label>
-        <input type="text" id="nome">
-
-        <label>SERVIDOR</label>
-        <select id="servidor-select" onchange="toggleServidorManual()">
+        <input type="text" id="nome" placeholder="Nome do Cliente">
+        <select id="servidor-select">
             <option value="Unitv">Unitv</option>
             <option value="Blinder">Blinder</option>
             <option value="Star Play">Star Play</option>
-            <option value="outro">Outro (Digitar...)</option>
+            <option value="Outro">Outro</option>
         </select>
-        
-        <div id="container-servidor-manual" style="display: none; margin-top: 10px;">
-            <label>DIGITE O NOME DO SERVIDOR</label>
-            <input type="text" id="servidor-manual" placeholder="Ex: Sky Go, Prime...">
-        </div>
-
-        <label>DATA DE VENCIMENTO</label>
         <input type="date" id="vencimento">
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div>
-                <label>LOGIN</label>
-                <input type="text" id="login_cli">
-            </div>
-            <div>
-                <label>SENHA</label>
-                <input type="text" id="senha_cli">
-            </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <input type="text" id="login_cli" placeholder="Usuário">
+            <input type="text" id="senha_cli" placeholder="Senha">
         </div>
-        
-        <button class="btn btn-add" onclick="salvar()" style="width:100%; justify-content: center; margin-top: 25px;">Salvar</button>
+        <button class="btn-add" onclick="salvar()" style="width:100%; margin-top: 10px;">Salvar Alterações</button>
     </div>
 </div>
 
 <script>
     let clientes = JSON.parse(localStorage.getItem('next_manager_data')) || [];
-    let currentView = 'completa';
+    let vistaAtual = 'completa';
 
-    function toggleServidorManual() {
-        const select = document.getElementById('servidor-select');
-        const container = document.getElementById('container-servidor-manual');
-        container.style.display = select.value === 'outro' ? 'block' : 'none';
+    function setTheme(theme) {
+        document.body.className = theme === 'light' ? '' : 'theme-' + theme;
+        document.querySelectorAll('.theme-toggle .toggle-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`theme-${theme}`).classList.add('active');
+        localStorage.setItem('next_theme_bruno', theme);
     }
 
-    function setView(view) {
-        currentView = view;
-        document.getElementById('view-completa').classList.toggle('active', view === 'completa');
-        document.getElementById('view-simples').classList.toggle('active', view === 'simples');
+    function alterarView(tipo) {
+        vistaAtual = tipo;
+        document.querySelectorAll('.view-toggle .toggle-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${tipo}`).classList.add('active');
         render();
     }
 
@@ -195,63 +186,41 @@
             const c = clientes.find(x => x.id == id);
             document.getElementById('edit-id').value = c.id;
             document.getElementById('nome').value = c.nome;
+            document.getElementById('servidor-select').value = c.servidor;
             document.getElementById('vencimento').value = c.vencimento;
             document.getElementById('login_cli').value = c.login_cli || "";
             document.getElementById('senha_cli').value = c.senha_cli || "";
-
-            const options = ["Unitv", "Blinder", "Star Play"];
-            if (options.includes(c.servidor)) {
-                document.getElementById('servidor-select').value = c.servidor;
-                document.getElementById('container-servidor-manual').style.display = 'none';
-            } else {
-                document.getElementById('servidor-select').value = 'outro';
-                document.getElementById('servidor-manual').value = c.servidor;
-                document.getElementById('container-servidor-manual').style.display = 'block';
-            }
         } else {
-            limparForm();
+            document.getElementById('edit-id').value = '';
+            document.querySelectorAll('.modal-content input').forEach(i => i.value = '');
         }
     }
 
     function fecharModal() { document.getElementById('modal').style.display = 'none'; }
-    function limparForm() { 
-        document.getElementById('edit-id').value = ''; 
-        document.querySelectorAll('.modal-content input').forEach(i => i.value = ''); 
-        document.getElementById('servidor-select').value = 'Unitv';
-        document.getElementById('container-servidor-manual').style.display = 'none';
-    }
 
     function salvar() {
         const id = document.getElementById('edit-id').value || Date.now();
-        const selectVal = document.getElementById('servidor-select').value;
-        const servidorFinal = selectVal === 'outro' ? document.getElementById('servidor-manual').value : selectVal;
-
         const novo = { 
             id: Number(id), 
-            nome: document.getElementById('nome').value.trim(), 
-            servidor: servidorFinal || "Geral", 
+            nome: document.getElementById('nome').value, 
+            servidor: document.getElementById('servidor-select').value, 
             vencimento: document.getElementById('vencimento').value,
-            login_cli: document.getElementById('login_cli').value.trim(),
-            senha_cli: document.getElementById('senha_cli').value.trim()
+            login_cli: document.getElementById('login_cli').value,
+            senha_cli: document.getElementById('senha_cli').value
         };
-
-        if(!novo.nome || !novo.vencimento) return alert("Preencha Nome e Vencimento!");
-        
+        if(!novo.nome || !novo.vencimento) return;
         const idx = clientes.findIndex(c => c.id == id);
         if(idx > -1) clientes[idx] = novo; else clientes.push(novo);
-        
         localStorage.setItem('next_manager_data', JSON.stringify(clientes));
         fecharModal();
         render();
     }
 
-    function adicionar30Dias(id) {
+    function renovar(id) {
         const idx = clientes.findIndex(c => c.id == id);
-        let base = new Date(clientes[idx].vencimento + 'T00:00:00');
-        let hoje = new Date(); hoje.setHours(0,0,0,0);
-        if(base < hoje) base = hoje;
-        base.setDate(base.getDate() + 30);
-        clientes[idx].vencimento = base.toISOString().split('T')[0];
+        let data = new Date(clientes[idx].vencimento + 'T00:00:00');
+        data.setDate(data.getDate() + 30);
+        clientes[idx].vencimento = data.toISOString().split('T')[0];
         localStorage.setItem('next_manager_data', JSON.stringify(clientes));
         render();
     }
@@ -261,54 +230,53 @@
         const ord = document.getElementById('ordenacao').value;
         const grid = document.getElementById('client-grid');
         grid.innerHTML = '';
+        
+        vistaAtual === 'compacta' ? grid.classList.add('compact-view') : grid.classList.remove('compact-view');
 
-        let filtrados = clientes.filter(c => 
-            c.nome.toLowerCase().includes(busca) || 
-            (c.servidor && c.servidor.toLowerCase().includes(busca)) ||
-            (c.login_cli && c.login_cli.toLowerCase().includes(busca))
-        );
+        let filtrados = clientes.filter(c => c.nome.toLowerCase().includes(busca));
 
         filtrados.sort((a, b) => {
             if (ord === 'vencimento') return new Date(a.vencimento) - new Date(b.vencimento);
-            if (ord === 'nome') return a.nome.localeCompare(b.nome);
-            if (ord === 'servidor') return (a.servidor || "").localeCompare(b.servidor || "");
+            return a.nome.localeCompare(b.nome);
         });
-
-        document.getElementById('count-box').innerText = `${filtrados.length} clientes registrados`;
 
         filtrados.forEach(c => {
             const dataVenc = new Date(c.vencimento + 'T00:00:00');
             const hoje = new Date(); hoje.setHours(0,0,0,0);
             const dias = Math.ceil((dataVenc - hoje) / (1000 * 60 * 60 * 24));
+            
+            // Lógica para os rótulos de Usuário e Senha
+            const labelUser = vistaAtual === 'completa' ? 'Usuário' : 'U';
+            const labelPass = vistaAtual === 'completa' ? 'Senha' : 'S';
 
             grid.innerHTML += `
-                <div class="card ${dias <= 0 ? 'vence-hoje' : ''}">
-                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--primary); text-transform: uppercase;">
-                        ${c.servidor}
-                    </span>
-                    <h3 style="margin-bottom:10px">👤 ${c.nome}</h3>
-                    <div class="info-row"><span>📅 Vencimento:</span> <strong>${c.vencimento.split('-').reverse().join('/')}</strong></div>
-                    <div class="info-row"><span>Status:</span> <span class="badge ${dias <= 0 ? 'alert' : 'success'}">${dias === 0 ? 'VENCE HOJE' : dias < 0 ? 'VENCIDO' : dias + ' dias'}</span></div>
+                <div class="card" style="${dias <= 0 ? 'border-left-color: #ef4444' : ''}">
+                    <div style="font-size: 0.55rem; font-weight: 800; color: var(--primary); text-transform: uppercase;">${c.servidor}</div>
+                    <h3 style="margin: 4px 0">👤 ${c.nome}</h3>
+                    <div class="info-row"><span>Venc:</span> <strong>${c.vencimento.split('-').reverse().join('/')}</strong></div>
+                    <div class="info-row"><span>Dias:</span> <span class="badge ${dias <= 0 ? 'alert' : 'success'}">${dias <= 0 ? 'VENCIDO' : dias + 'd'}</span></div>
                     
-                    ${currentView === 'completa' && (c.login_cli || c.senha_cli) ? `
+                    ${(vistaAtual !== 'simples') ? `
                         <div class="access-box">
-                            ${c.login_cli ? `<div><strong>User:</strong> ${c.login_cli}</div>` : ''}
-                            ${c.senha_cli ? `<div><strong>Senha:</strong> ${c.senha_cli}</div>` : ''}
+                            <div><strong>${labelUser}:</strong> ${c.login_cli || '-'}</div>
+                            <div><strong>${labelPass}:</strong> ${c.senha_cli || '-'}</div>
                         </div>
                     ` : ''}
 
                     <div class="actions">
-                        <button class="btn-action btn-renovar" onclick="adicionar30Dias(${c.id})">⚡ Renovar</button>
-                        <button class="btn-action btn-edit" onclick="abrirModal(${c.id})">Editar</button>
-                        <button class="btn-action btn-del" onclick="remover(${c.id})">Excluir</button>
+                        <button class="btn-action btn-renovar" onclick="renovar(${c.id})">⚡ RENOVAR 30 DIAS</button>
+                        <button class="btn-action" onclick="abrirModal(${c.id})">EDITAR</button>
+                        <button class="btn-action btn-del" onclick="remover(${c.id})">EXCLUIR</button>
                     </div>
                 </div>
             `;
         });
     }
 
-    function remover(id) { if(confirm("Remover este cliente?")) { clientes = clientes.filter(c => c.id != id); localStorage.setItem('next_manager_data', JSON.stringify(clientes)); render(); } }
+    function remover(id) { if(confirm("Excluir cliente?")) { clientes = clientes.filter(c => c.id != id); localStorage.setItem('next_manager_data', JSON.stringify(clientes)); render(); } }
     
+    const savedTheme = localStorage.getItem('next_theme_bruno') || 'black';
+    setTheme(savedTheme);
     render();
 </script>
 </body>
