@@ -22,7 +22,6 @@
 
         .container { max-width: 1200px; margin: auto; }
 
-        /* Cabeçalho Limpo */
         .header { 
             display: flex; justify-content: space-between; align-items: center; 
             margin-bottom: 20px; gap: 20px; flex-wrap: wrap;
@@ -36,19 +35,27 @@
         .signature span { color: var(--primary); }
 
         /* Controles */
-        .controls-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .search-bar { flex: 2; position: relative; min-width: 280px; }
+        .controls-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .search-bar { flex: 2; position: relative; min-width: 250px; }
         .search-bar input { 
             width: 100%; padding: 14px 45px; border-radius: 12px; border: 2px solid #e2e8f0; 
             outline: none; background: white; transition: 0.2s; font-size: 1rem;
         }
         .search-bar .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
 
-        .filter-select { flex: 1; min-width: 180px; }
+        .filter-select { flex: 1; min-width: 150px; }
         select.styled-select { 
             width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #e2e8f0; 
             background: white; outline: none; cursor: pointer; font-weight: 600; color: var(--text);
         }
+
+        .view-toggle {
+            display: flex; background: #e2e8f0; padding: 4px; border-radius: 10px; gap: 4px;
+        }
+        .toggle-btn {
+            padding: 8px 12px; border: none; border-radius: 7px; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: 0.2s; color: var(--text-light);
+        }
+        .toggle-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
         /* Grid */
         .client-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
@@ -65,8 +72,7 @@
         .success { background: #dcfce7; color: var(--success); }
 
         .access-box { background: #f1f5f9; padding: 12px; border-radius: 10px; margin-top: 15px; font-size: 0.85rem; border: 1px solid #e2e8f0; }
-        .highlight { background: #fef08a; color: #854d0e; border-radius: 2px; }
-
+        
         .btn { padding: 12px 20px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
         .btn-add { background: var(--primary); color: white; }
         
@@ -78,6 +84,9 @@
 
         #modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 100; }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 95%; max-width: 450px; }
+
+        input, select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; outline: none; }
+        label { display:block; font-size:0.75rem; font-weight:700; color:var(--text-light); margin-bottom:5px; margin-top: 10px; }
 
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
@@ -102,14 +111,20 @@
     <div class="controls-row">
         <div class="search-bar">
             <span class="search-icon">🔍</span>
-            <input type="text" id="busca" placeholder="Pesquisar clientes..." oninput="render()">
+            <input type="text" id="busca" placeholder="Pesquisar..." oninput="render()">
         </div>
+        
         <div class="filter-select">
             <select id="ordenacao" class="styled-select" onchange="render()">
-                <option value="vencimento">Ordenar por Vencimento</option>
-                <option value="nome">Ordenar por Nome (A-Z)</option>
-                <option value="servidor">Ordenar por Servidor</option>
+                <option value="vencimento">Vencimento</option>
+                <option value="nome">Nome (A-Z)</option>
+                <option value="servidor">Servidor</option>
             </select>
+        </div>
+
+        <div class="view-toggle">
+            <button id="view-completa" class="toggle-btn active" onclick="setView('completa')">Completa</button>
+            <button id="view-simples" class="toggle-btn" onclick="setView('simples')">Simples</button>
         </div>
     </div>
 
@@ -120,40 +135,59 @@
 <!-- Modal -->
 <div id="modal" onclick="if(event.target == this) fecharModal()">
     <div class="modal-content">
-        <h2 style="margin-bottom: 20px;">📝 Cadastro de Cliente</h2>
+        <h2 style="margin-bottom: 10px;">📝 Dados do Cliente</h2>
         <input type="hidden" id="edit-id">
-        <div style="margin-bottom: 15px;">
-            <label style="display:block; font-size:0.75rem; font-weight:700; color:var(--text-light); margin-bottom:5px">NOME COMPLETO</label>
-            <input type="text" id="nome" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px;">
+        
+        <label>NOME</label>
+        <input type="text" id="nome">
+
+        <label>SERVIDOR</label>
+        <select id="servidor-select" onchange="toggleServidorManual()">
+            <option value="Unitv">Unitv</option>
+            <option value="Blinder">Blinder</option>
+            <option value="Star Play">Star Play</option>
+            <option value="outro">Outro (Digitar...)</option>
+        </select>
+        
+        <div id="container-servidor-manual" style="display: none; margin-top: 10px;">
+            <label>DIGITE O NOME DO SERVIDOR</label>
+            <input type="text" id="servidor-manual" placeholder="Ex: Sky Go, Prime...">
         </div>
-        <div style="margin-bottom: 15px;">
-            <label style="display:block; font-size:0.75rem; font-weight:700; color:var(--text-light); margin-bottom:5px">SISTEMA / SERVIDOR</label>
-            <select id="servidor" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px;">
-                <option value="Unitv">Unitv</option>
-                <option value="Blinder">Blinder</option>
-                <option value="Star Play">Star Play</option>
-            </select>
-        </div>
-        <div style="margin-bottom: 15px;">
-            <label style="display:block; font-size:0.75rem; font-weight:700; color:var(--text-light); margin-bottom:5px">DATA DE VENCIMENTO</label>
-            <input type="date" id="vencimento" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px;">
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+
+        <label>DATA DE VENCIMENTO</label>
+        <input type="date" id="vencimento">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
-                <label style="display:block; font-size:0.75rem; font-weight:700; color:var(--text-light); margin-bottom:5px">USUÁRIO</label>
-                <input type="text" id="login_cli" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px;">
+                <label>LOGIN</label>
+                <input type="text" id="login_cli">
             </div>
             <div>
-                <label style="display:block; font-size:0.75rem; font-weight:700; color:var(--text-light); margin-bottom:5px">SENHA</label>
-                <input type="text" id="senha_cli" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:10px;">
+                <label>SENHA</label>
+                <input type="text" id="senha_cli">
             </div>
         </div>
-        <button class="btn btn-add" onclick="salvar()" style="width:100%; justify-content: center;">Salvar Dados</button>
+        
+        <button class="btn btn-add" onclick="salvar()" style="width:100%; justify-content: center; margin-top: 25px;">Salvar</button>
     </div>
 </div>
 
 <script>
     let clientes = JSON.parse(localStorage.getItem('next_manager_data')) || [];
+    let currentView = 'completa';
+
+    function toggleServidorManual() {
+        const select = document.getElementById('servidor-select');
+        const container = document.getElementById('container-servidor-manual');
+        container.style.display = select.value === 'outro' ? 'block' : 'none';
+    }
+
+    function setView(view) {
+        currentView = view;
+        document.getElementById('view-completa').classList.toggle('active', view === 'completa');
+        document.getElementById('view-simples').classList.toggle('active', view === 'simples');
+        render();
+    }
 
     function abrirModal(id = null) {
         document.getElementById('modal').style.display = 'flex';
@@ -161,29 +195,51 @@
             const c = clientes.find(x => x.id == id);
             document.getElementById('edit-id').value = c.id;
             document.getElementById('nome').value = c.nome;
-            document.getElementById('servidor').value = c.servidor;
             document.getElementById('vencimento').value = c.vencimento;
             document.getElementById('login_cli').value = c.login_cli || "";
             document.getElementById('senha_cli').value = c.senha_cli || "";
+
+            const options = ["Unitv", "Blinder", "Star Play"];
+            if (options.includes(c.servidor)) {
+                document.getElementById('servidor-select').value = c.servidor;
+                document.getElementById('container-servidor-manual').style.display = 'none';
+            } else {
+                document.getElementById('servidor-select').value = 'outro';
+                document.getElementById('servidor-manual').value = c.servidor;
+                document.getElementById('container-servidor-manual').style.display = 'block';
+            }
+        } else {
+            limparForm();
         }
     }
 
-    function fecharModal() { document.getElementById('modal').style.display = 'none'; limparForm(); }
-    function limparForm() { document.getElementById('edit-id').value = ''; document.querySelectorAll('.modal-content input').forEach(i => i.value = ''); }
+    function fecharModal() { document.getElementById('modal').style.display = 'none'; }
+    function limparForm() { 
+        document.getElementById('edit-id').value = ''; 
+        document.querySelectorAll('.modal-content input').forEach(i => i.value = ''); 
+        document.getElementById('servidor-select').value = 'Unitv';
+        document.getElementById('container-servidor-manual').style.display = 'none';
+    }
 
     function salvar() {
         const id = document.getElementById('edit-id').value || Date.now();
+        const selectVal = document.getElementById('servidor-select').value;
+        const servidorFinal = selectVal === 'outro' ? document.getElementById('servidor-manual').value : selectVal;
+
         const novo = { 
             id: Number(id), 
             nome: document.getElementById('nome').value.trim(), 
-            servidor: document.getElementById('servidor').value, 
+            servidor: servidorFinal || "Geral", 
             vencimento: document.getElementById('vencimento').value,
             login_cli: document.getElementById('login_cli').value.trim(),
             senha_cli: document.getElementById('senha_cli').value.trim()
         };
+
         if(!novo.nome || !novo.vencimento) return alert("Preencha Nome e Vencimento!");
+        
         const idx = clientes.findIndex(c => c.id == id);
         if(idx > -1) clientes[idx] = novo; else clientes.push(novo);
+        
         localStorage.setItem('next_manager_data', JSON.stringify(clientes));
         fecharModal();
         render();
@@ -198,12 +254,6 @@
         clientes[idx].vencimento = base.toISOString().split('T')[0];
         localStorage.setItem('next_manager_data', JSON.stringify(clientes));
         render();
-    }
-
-    function highlightText(text, query) {
-        if (!query) return text;
-        const regex = new RegExp(`(${query})`, 'gi');
-        return text.replace(regex, '<span class="highlight">$1</span>');
     }
 
     function render() {
@@ -224,7 +274,7 @@
             if (ord === 'servidor') return (a.servidor || "").localeCompare(b.servidor || "");
         });
 
-        document.getElementById('count-box').innerText = `${filtrados.length} clientes encontrados`;
+        document.getElementById('count-box').innerText = `${filtrados.length} clientes registrados`;
 
         filtrados.forEach(c => {
             const dataVenc = new Date(c.vencimento + 'T00:00:00');
@@ -234,21 +284,21 @@
             grid.innerHTML += `
                 <div class="card ${dias <= 0 ? 'vence-hoje' : ''}">
                     <span style="font-size: 0.7rem; font-weight: 800; color: var(--primary); text-transform: uppercase;">
-                        ${highlightText(c.servidor || 'Geral', busca)}
+                        ${c.servidor}
                     </span>
-                    <h3 style="margin-bottom:10px">👤 ${highlightText(c.nome, busca)}</h3>
+                    <h3 style="margin-bottom:10px">👤 ${c.nome}</h3>
                     <div class="info-row"><span>📅 Vencimento:</span> <strong>${c.vencimento.split('-').reverse().join('/')}</strong></div>
                     <div class="info-row"><span>Status:</span> <span class="badge ${dias <= 0 ? 'alert' : 'success'}">${dias === 0 ? 'VENCE HOJE' : dias < 0 ? 'VENCIDO' : dias + ' dias'}</span></div>
                     
-                    ${(c.login_cli || c.senha_cli) ? `
+                    ${currentView === 'completa' && (c.login_cli || c.senha_cli) ? `
                         <div class="access-box">
-                            ${c.login_cli ? `<div class="access-item"><span>👤</span> <strong>Login:</strong> ${highlightText(c.login_cli, busca)}</div>` : ''}
-                            ${c.senha_cli ? `<div class="access-item"><span>🔑</span> <strong>Senha:</strong> ${c.senha_cli}</div>` : ''}
+                            ${c.login_cli ? `<div><strong>User:</strong> ${c.login_cli}</div>` : ''}
+                            ${c.senha_cli ? `<div><strong>Senha:</strong> ${c.senha_cli}</div>` : ''}
                         </div>
                     ` : ''}
 
                     <div class="actions">
-                        <button class="btn-action btn-renovar" onclick="adicionar30Dias(${c.id})">⚡ Renovar +30 Dias</button>
+                        <button class="btn-action btn-renovar" onclick="adicionar30Dias(${c.id})">⚡ Renovar</button>
                         <button class="btn-action btn-edit" onclick="abrirModal(${c.id})">Editar</button>
                         <button class="btn-action btn-del" onclick="remover(${c.id})">Excluir</button>
                     </div>
@@ -257,7 +307,7 @@
         });
     }
 
-    function remover(id) { if(confirm("Deseja realmente excluir este cliente?")) { clientes = clientes.filter(c => c.id != id); localStorage.setItem('next_manager_data', JSON.stringify(clientes)); render(); } }
+    function remover(id) { if(confirm("Remover este cliente?")) { clientes = clientes.filter(c => c.id != id); localStorage.setItem('next_manager_data', JSON.stringify(clientes)); render(); } }
     
     render();
 </script>
